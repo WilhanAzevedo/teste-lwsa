@@ -1,0 +1,57 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: teste-lwsa-app
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - teste-lwsa-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  queue-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: teste-lwsa-queue-worker
+    restart: always
+    networks:
+      - teste-lwsa-network
+    command: ["/usr/bin/supervisord", "-n"]
+    volumes:
+      - ./:/var/www/html
+
+  db:
+    image: postgres:17
+    container_name: teste-lwsa-db
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-teste_lwsa_db}
+      POSTGRES_USER: ${DB_USERNAME:-root}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    ports:
+      - "5432:5432"
+    networks:
+      - teste-lwsa-network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    container_name: teste-lwsa-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - teste-lwsa-network
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  teste-lwsa-network:
+    driver: bridge
+

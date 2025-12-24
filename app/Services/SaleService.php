@@ -12,6 +12,7 @@ use App\Repositories\Interfaces\SaleRepositoryInterface;
 use App\Services\Interfaces\SaleServiceInterface;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 
 class SaleService implements SaleServiceInterface
 {
@@ -33,7 +34,7 @@ class SaleService implements SaleServiceInterface
             $now = now();
 
             $itemsData = collect($itemsData)->sortBy('product_id')->values()->all();
-            
+
             foreach ($itemsData as $item) {
                 $product = $this->productRepo->getById($item['product_id']);
 
@@ -79,19 +80,25 @@ class SaleService implements SaleServiceInterface
 
             SaleCreated::dispatch($sale);
 
+            Cache::forget("sale_{$sale->id}");
+
             return $sale->load('items.product');
         });
     }
 
     public function getById(int $id): Sale
     {
-        $sale = $this->saleRepo->getById($id);
+        $cacheKey = "sale_{$id}";
 
-        if (!$sale) {
-            throw new Exception("Sale ID {$id} not found.");
-        }
+        return Cache::remember($cacheKey, 3600, function () use ($id) {
+            $sale = $this->saleRepo->getById($id);
 
-        return $sale->load('items.product');
+            if (!$sale) {
+                throw new Exception("Sale ID {$id} not found.");
+            }
+
+            return $sale->load('items.product');
+        });
     }
 
 }

@@ -8,6 +8,7 @@ use App\Services\Interfaces\InventoryServiceInterface;
 use App\Repositories\Interfaces\SaleRepositoryInterface;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class UpdateInventory implements ShouldQueue
@@ -43,6 +44,7 @@ class UpdateInventory implements ShouldQueue
         }
 
         $this->saleRepo->updateStatus($sale->id, SaleStatus::COMPLETED);
+        Cache::forget("sale_{$sale->id}");
         Log::info("Inventory successfully updated for Sale #{$sale->id}");
     }
 }

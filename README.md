@@ -1,59 +1,161 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# API de Controle de Estoque e Vendas
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API REST desenvolvida com Laravel para gerenciamento simplificado de estoque e vendas para um sistema ERP.
 
-## About Laravel
+## 📋 Requisitos
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Docker
+- Docker Compose
+- Git
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Tecnologias
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Laravel 12** - Framework PHP
+- **PHP 8.2+** - Linguagem de programação
+- **PostgreSQL 17** - Banco de dados
+- **Redis 7** - Cache e gerenciamento de filas
+- **Supervisor** - Gerenciamento de processos (queue worker)
+- **PHPUnit** - Testes unitários
 
-## Learning Laravel
+## 🏗️ Arquitetura
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+O projeto utiliza as seguintes práticas e padrões:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **Repository Pattern** - Abstração da camada de dados
+- **Service Layer** - Lógica de negócio centralizada
+- **Dependency Injection** - Inversão de controle via interfaces
+- **Events & Listeners** - Processamento assíncrono
+- **Form Requests** - Validação de entrada
+- **API Resources** - Formatação de resposta
+- **Queue Workers** - Processamento em background
 
-## Laravel Sponsors
+## 📦 Instalação
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 1. Clone o repositório
 
-### Premium Partners
+```bash
+git clone <repository-url>
+cd teste-lwsa
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 2. Configure as variáveis de ambiente
 
-## Contributing
+```bash
+cp .env.example .env
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3. Suba os containers Docker
 
-## Code of Conduct
+```bash
+docker-compose up -d
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Isso irá criar 4 containers:
+- `teste-lwsa-app` - Aplicação Laravel (porta 8080)
+- `teste-lwsa-queue-worker` - Worker para processar filas
+- `teste-lwsa-db` - PostgreSQL (porta 5432)
+- `teste-lwsa-redis` - Redis (porta 6379)
 
-## Security Vulnerabilities
+### 4. Instale as dependências
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+docker exec -it teste-lwsa-app composer install
+```
 
-## License
+### 5. Gere a chave da aplicação
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+docker exec -it teste-lwsa-app php artisan key:generate
+```
+
+### 6. Execute as migrations
+
+```bash
+docker exec -it teste-lwsa-app php artisan migrate
+```
+
+### 7. Popule o banco de dados (opcional)
+
+```bash
+docker exec -it teste-lwsa-app php artisan db:seed --class=ProductSeeder
+```
+
+Isso irá criar 5 produtos de exemplo com seus respectivos inventários.
+
+## 🧪 Testes
+
+Execute os testes unitários:
+
+```bash
+docker exec -it teste-lwsa-app php artisan test
+```
+
+Ou
+
+```bash
+docker exec -it teste-lwsa-app /vendor/bin/phpunit
+```
+
+
+## 📚 Endpoints da API
+
+### Base URL
+```
+http://localhost:8080
+```
+
+### Registrar Entrada de Estoque
+```http
+POST /api/inventory
+Content-Type: application/json
+
+{
+  "product_id": 1,
+  "quantity": 50,
+  "cost_price": 100.00
+}
+```
+
+### Consultar Estoque
+```http
+GET /api/inventory?page=1&per_page=10
+```
+
+### Registrar Venda
+```http
+POST /api/sales
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "product_id": 1,
+      "quantity": 2
+    }
+  ]
+}
+```
+
+### Consultar Venda
+```http
+GET /api/sales/{id}
+```
+
+## ⚙️ Funcionalidades
+
+### Sistema de Eventos
+
+Quando uma venda é criada:
+1. O evento `SaleCreated` é disparado
+2. O listener `UpdateInventory` processa a atualização assíncrona via fila
+3. O estoque de cada produto é debitado automaticamente
+4. Se houver falha (estoque insuficiente), a venda é cancelada automaticamente
+
+### Gerenciamento de Cache
+
+- Listagens de inventário e detalhes de venda são armazenados em cache
+- Cache é invalidado automaticamente ao adicionar/debitar estoque ou criar uma venda
+- Utiliza Redis com tags para gerenciamento eficiente
+
+
+

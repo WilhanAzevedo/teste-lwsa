@@ -28,7 +28,7 @@ class StoreSaleRequest extends FormRequest
             'items.required' => 'Items is required.',
             'items.array' => 'Items must be an array.',
             'items.min' => 'At least one item is required.',
-            'items.max' => 'A maximum of one item is allowed.',
+            'items.max' => 'A maximum of 100 items are allowed.',
             'items.*.product_id.required' => 'Product ID is required for each item.',
             'items.*.product_id.integer' => 'Product ID must be an integer.',
             'items.*.product_id.exists' => 'The selected product does not exist.',

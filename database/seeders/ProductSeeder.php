@@ -58,7 +58,7 @@ class ProductSeeder extends Seeder
 
             Inventory::create([
                 'product_id' => $product->id,
-                'quantity' => 0,
+                'quantity' => rand(1, 100),
                 'last_updated' => now(),
             ]);
         }

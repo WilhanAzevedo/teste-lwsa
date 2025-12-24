@@ -10,4 +10,10 @@ interface InventoryRepositoryInterface
     public function updateByProductId(int $productId, int $quantity): Inventory;
 
     public function getInventory(int $page, int $perPage) : LengthAwarePaginator;
+
+    public function findByProductId(int $productId): ?Inventory;
+
+    public function findByProductIdLocked(int $productId): ?Inventory;
+
+    public function decrementStock(int $productId, int $quantity): Inventory;
 }

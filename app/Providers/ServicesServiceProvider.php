@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Sale;
 use App\Services\Interfaces\InventoryServiceInterface;
 use App\Services\Interfaces\ProductServiceInterface;
 use App\Services\Interfaces\ReportServiceInterface;
@@ -22,6 +23,7 @@ class ServicesServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(InventoryServiceInterface::class, InventoryService::class);
+        $this->app->bind(SaleServiceInterface::class, SaleService::class);
     }
 
     /**
@@ -31,6 +33,7 @@ class ServicesServiceProvider extends ServiceProvider
     {
         return [
             InventoryServiceInterface::class,
+            SaleServiceInterface::class,
         ];
     }
 }

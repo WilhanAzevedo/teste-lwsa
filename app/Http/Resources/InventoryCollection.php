@@ -25,6 +25,8 @@ class InventoryCollection extends ResourceCollection
     public function paginationInformation($request, $paginated, $default)
     {
        
+        unset($default['links']);
+
         $default['meta'] = [
             'current_page' => $default['meta']['current_page'],
             'per_page'     => $default['meta']['per_page'],
@@ -32,8 +34,6 @@ class InventoryCollection extends ResourceCollection
             'last_page'    => $default['meta']['last_page'],
         ];
 
-        $meta['meta'] = $default['meta'];
-
-        return $meta;
+        return $default;
     }
 }

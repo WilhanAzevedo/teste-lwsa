@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Inventory;
@@ -21,7 +22,6 @@ class InventoryService implements InventoryServiceInterface
 
     public function store(int $productId, int $quantity, float $costPrice): Inventory
     {
-        
         return DB::transaction(function () use ($productId, $quantity, $costPrice) {
             try {
                 $product = $this->productRepo->getById($productId);
@@ -36,19 +36,17 @@ class InventoryService implements InventoryServiceInterface
                 ]);
 
                 Cache::tags([self::CACHE_TAG])->flush();
-                
-                return $inventory->load('product');
 
+                return $inventory->load('product');
             } catch (\Exception $e) {
-                
-                Log::error("Falha na operação de estoque ID {$productId}: " . $e->getMessage(), [
+
+                Log::error("Failed to perform inventory operation for product ID {$productId}: " . $e->getMessage(), [
                     'trace' => $e->getTraceAsString()
                 ]);
 
                 throw new \Exception("Failed to store inventory");
             }
         });
-
     }
 
     public function getInventory(int $page = 1, int $perPage = 10): LengthAwarePaginator
@@ -60,5 +58,27 @@ class InventoryService implements InventoryServiceInterface
         });
     }
 
+    public function debit(int $productId, int $quantity): Inventory
+    {
+       
+        return DB::transaction(function () use ($productId, $quantity) {
 
+            $inventory = $this->inventoryRepo->findByProductIdLocked($productId);
+
+    
+            if (!$inventory) {
+                throw new \Exception("Inventory not found for product ID {$productId}");
+            }
+
+            if ($inventory->quantity < $quantity) {
+                throw new \Exception("Insufficient stock. Available: {$inventory->quantity}, Requested: {$quantity}");
+            }
+
+            $this->inventoryRepo->decrementStock($productId, $quantity);
+
+            Cache::tags([self::CACHE_TAG])->flush();
+            
+            return $inventory->refresh();
+        });
+    }
 }

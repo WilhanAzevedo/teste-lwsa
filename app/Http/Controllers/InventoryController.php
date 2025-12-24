@@ -26,7 +26,7 @@ class InventoryController extends Controller
 
             return response()->json(['message' => 'Inventory added successfully'], 201);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to add inventory', 'details' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to add inventory', 'details' => $e->getMessage()], 422);
         }
     }
 
@@ -41,7 +41,7 @@ class InventoryController extends Controller
 
             return new InventoryCollection($inventoryData);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to retrieve inventory'], 500);
+            return response()->json(['error' => 'Failed to retrieve inventory'], 422);
         }
     }
 

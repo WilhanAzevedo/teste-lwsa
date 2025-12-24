@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 
 class GetInventoryRequest extends FormRequest
 {
@@ -25,5 +27,12 @@ class GetInventoryRequest extends FormRequest
             'page' => 'nullable|integer|min:1',
             'per_page' => 'nullable|integer|min:1',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new ValidationException($validator, response()->json([
+            'errors' => $validator->errors()
+        ], 422));
     }
 }

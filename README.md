@@ -82,6 +82,18 @@ docker exec -it teste-lwsa-app php artisan db:seed --class=ProductSeeder
 
 Isso irá criar 5 produtos de exemplo com seus respectivos inventários.
 
+
+### 8. Inicie o worker de filas
+```bash
+docker exec -d teste-lwsa-queue-worker supervisorctl start all
+```
+
+
+### A aplicação estará disponível e pronta para uso em:
+```
+http://localhost:8080
+```
+
 ## 🧪 Testes
 
 Execute os testes unitários:
@@ -93,7 +105,7 @@ docker exec -it teste-lwsa-app php artisan test
 Ou
 
 ```bash
-docker exec -it teste-lwsa-app /vendor/bin/phpunit
+docker exec -it teste-lwsa-app vendor/bin/phpunit
 ```
 
 

@@ -43,13 +43,11 @@ class InventoryRepository implements InventoryRepositoryInterface
 
     public function findByProductId(int $productId): ?Inventory
     {
-        // Retorna o model ou null se não existir estoque ainda
         return Inventory::where('product_id', $productId)->first();
     }
 
     public function decrementStock(int $productId, int $quantity): Inventory
     {
-        // Busca, decrementa e atualiza data
         $inventory = Inventory::where('product_id', $productId)->firstOrFail();
         $inventory->decrement('quantity', $quantity);
         $inventory->touch('last_updated');
@@ -59,7 +57,6 @@ class InventoryRepository implements InventoryRepositoryInterface
 
     public function findByProductIdLocked(int $productId): ?Inventory
     {
-        // O Repository é o único lugar autorizado a falar "Eloquentsês"
         return Inventory::where('product_id', $productId)
             ->lockForUpdate()
             ->first();

@@ -2,16 +2,9 @@
 
 namespace App\Providers;
 
-use App\Models\Sale;
 use App\Services\Interfaces\InventoryServiceInterface;
-use App\Services\Interfaces\ProductServiceInterface;
-use App\Services\Interfaces\ReportServiceInterface;
-use App\Services\Interfaces\SaleItemsServiceInterface;
 use App\Services\Interfaces\SaleServiceInterface;
 use App\Services\InventoryService;
-use App\Services\ProductService;
-use App\Services\ReportService;
-use App\Services\SaleItemsService;
 use App\Services\SaleService;
 use Illuminate\Support\ServiceProvider;
 

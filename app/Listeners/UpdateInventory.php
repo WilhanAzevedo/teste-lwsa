@@ -7,12 +7,11 @@ use App\Events\SaleCreated;
 use App\Services\Interfaces\InventoryServiceInterface;
 use App\Repositories\Interfaces\SaleRepositoryInterface;
 use Exception;
-use Illuminate\Contracts\Queue\ShouldQueue; // Adicione "implements ShouldQueue" se quiser fila (async)
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
 class UpdateInventory implements ShouldQueue
 {
-    // Injetamos a Interface do serviço de estoque
     public function __construct(
         protected InventoryServiceInterface $inventoryService,
         protected SaleRepositoryInterface $saleRepo
@@ -30,14 +29,12 @@ class UpdateInventory implements ShouldQueue
 
         foreach ($sale->items as $item) {
             try {
-                // Chama o método 'debit' que criamos no InventoryService
                 $this->inventoryService->debit(
                     $item->product_id,
                     $item->quantity
                 );
 
             } catch (Exception $e) {
-                // Log the technical error
                 Log::error("Error debiting inventory for Sale #{$sale->id}, Product {$item->product_id}: " . $e->getMessage());
 
                 $this->saleRepo->updateStatus($sale->id, SaleStatus::CANCELED);

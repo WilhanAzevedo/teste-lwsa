@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\SaleStatus;
 use App\Events\SaleCreated;
 use App\Models\Sale;
+use App\Repositories\Interfaces\InventoryRepositoryInterface;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 use App\Repositories\Interfaces\SaleItemRepositoryInterface;
 use App\Repositories\Interfaces\SaleRepositoryInterface;
@@ -17,7 +18,9 @@ class SaleService implements SaleServiceInterface
     public function __construct(
         protected SaleRepositoryInterface $saleRepo,
         protected SaleItemRepositoryInterface $saleItemRepo,
-        protected ProductRepositoryInterface $productRepo
+        protected ProductRepositoryInterface $productRepo,
+        protected InventoryRepositoryInterface $inventoryRepo
+
     ) {}
 
     public function create(array $itemsData): Sale
@@ -29,6 +32,8 @@ class SaleService implements SaleServiceInterface
             $preparedItems = [];
             $now = now();
 
+            $itemsData = collect($itemsData)->sortBy('product_id')->values()->all();
+            
             foreach ($itemsData as $item) {
                 $product = $this->productRepo->getById($item['product_id']);
 
@@ -36,7 +41,9 @@ class SaleService implements SaleServiceInterface
                     throw new Exception("Product ID {$item['product_id']} not found.");
                 }
 
-                $currentStock = $product->inventory?->quantity ?? 0;
+                $inventory = $this->inventoryRepo->findByProductIdLocked($product->id);
+
+                $currentStock = $inventory?->quantity ?? 0;
                 $requestedQty = $item['quantity'];
 
                 if ($currentStock < $requestedQty) {
